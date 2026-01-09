@@ -1,420 +1,386 @@
-# 🚀 Solana Trade
+# Solana DEX 交易打包服务
 
-A comprehensive, production-ready Solana trading library supporting 15+ DEXs with advanced MEV protection, built for both programmatic integration and CLI usage. Perfect for your trading bots / Solana dApps!
+一个功能完善的 Solana DEX 交易打包服务，支持 15+ 主流 DEX，提供 Jupiter 风格的 API 接口。适用于交易机器人、DApp 集成等场景。
 
-<div align="center">
+## 功能特性
 
-[![npm version](https://badge.fury.io/js/solana-trade.svg)](https://badge.fury.io/js/solana-trade)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
+- 🏪 **支持 15+ DEX**: Pump.fun、PumpSwap、Raydium (AMM/CLMM/CPMM/Launchpad)、Orca、Meteora (DLMM/DAMM/DBC)、Moonit、Heaven、Sugar、Boop.fun
+- 🛡️ **MEV 保护**: 支持 Jito、Nozomi、Astralane 等 MEV 保护服务
+- ⚡ **高性能**: 优化的交易构建流程，自动池发现
+- 🎯 **Jupiter 风格 API**: 熟悉的 quote/swap 接口设计
+- 💻 **双接口**: 完整的编程 API + 强大的 CLI 工具
+- 📦 **TypeScript**: 完整的类型定义
+- 🔧 **可配置**: 丰富的自定义选项
+- 📊 **交易控制**: 优先级费用、滑点保护、模拟控制
 
-</div>
+## 支持的市场
 
-## ✨ Features
+| 协议 | 市场标识符 |
+|------|-----------|
+| Pump.fun | `PUMP_FUN` |
+| Pump Swap | `PUMP_SWAP` |
+| Raydium AMM | `RAYDIUM_AMM` |
+| Raydium CLMM | `RAYDIUM_CLMM` |
+| Raydium CPMM | `RAYDIUM_CPMM` |
+| Raydium Launchpad | `RAYDIUM_LAUNCHPAD` |
+| Orca Whirlpool | `ORCA_WHIRLPOOL` |
+| Meteora DLMM | `METEORA_DLMM` |
+| Meteora DAMM V1 | `METEORA_DAMM_V1` |
+| Meteora DAMM V2 | `METEORA_DAMM_V2` |
+| Meteora DBC | `METEORA_DBC` |
+| Moonit | `MOONIT` |
+| Heaven XYZ | `HEAVEN` |
+| Sugar | `SUGAR` |
+| Boop.fun | `BOOP_FUN` |
 
-- 🏪 **15+ DEX Support**: Pump.fun, PumpSwap, Raydium (AMM/CLMM/CPMM/Launchpad), Orca, Meteora (DLMM/DAMM/DBC), Moonit, Heaven, Sugar, Boop.fun
-- 🛡️ **Advanced MEV Protection**: Jito, Nozomi, Astralane with regional optimization
-- ⚡ **High Performance**: Optimized transaction building with automatic pool discovery
-- 🎯 **Smart Routing**: Intelligent provider selection based on tip amounts and availability  
-- 💻 **Dual Interface**: Full-featured programmatic API + powerful CLI
-- 📦 **TypeScript**: Complete type definitions
-- 🔧 **Configurable**: Extensive customization options for advanced users
-- 📊 **Transaction Control**: Priority fees, slippage protection, simulation control
-- 📈 **Price & Curve Insight**: Get price in SOL/lamports for any mint, plus bonding curve completion percent for launchpads
-- 🌐 **Multi-Region**: Global MEV protection endpoints for optimal performance
+## 快速开始
 
-## 📋 Supported Markets & Protocols
-| Protocol | Market ID |
-|----------|-----------|
-| **Pump.fun** | `PUMP_FUN` |
-| **Pump Swap** | `PUMP_SWAP` |
-| **Raydium AMM** | `RAYDIUM_AMM` |
-| **Raydium CLMM** | `RAYDIUM_CLMM` |
-| **Raydium CPMM** | `RAYDIUM_CPMM` |
-| **Raydium Launchpad** | `RAYDIUM_LAUNCHPAD` |
-| **Orca Whirlpool** | `ORCA_WHIRLPOOL` |
-| **Meteora DLMM** | `METEORA_DLMM` |
-| **Meteora DAMM V1** | `METEORA_DAMM_V1` |
-| **Meteora DAMM V2** | `METEORA_DAMM_V2` |
-| **Meteora DBC** | `METEORA_DBC` |
-| **Moonit** | `MOONIT` |
-| **Heaven XYZ** | `HEAVEN` |
-| **Sugar** | `SUGAR` |
-| **Boop.fun** | `BOOP_FUN` |
-
-## 🛡️ Transaction Senders / MEV Protection Services
-
-### Jito Labs
-- **Minimum Tip**: No minimum (bundles require ≥1000 lamports)
-- **Environment**: `JITO_UUID`
-- **Regions**: `MAINNET`, `AMS`, `DUB`, `FRA`, `LON`, `NY`, `SLC`, `SG`, `TYO`
-
-### Nozomi
-- **Minimum Tip**: 0.001 SOL
-- **Environment**: `NOZOMI_API_KEY` (standard), `NOZOMI_API_KEY_ANTIMEV` (anti-MEV)
-- **Regions**: `PITT`, `TYO`, `SG`, `EWR`, `AMS`, `FRA`
-
-### Astralane
-- **Minimum Tip**: 0.00001 SOL
-- **Environment**: `ASTRALANE_API_KEY`
-- **Regions**: `FR`, `LAX`, `JP`, `NY`, `AMS`, `LIM`
-
-## 🚀 Installation
+### 1. 安装依赖
 
 ```bash
-npm install solana-trade
-# or
-yarn add solana-trade
-# or
-pnpm add solana-trade
+npm install
 ```
 
-## ⚡ Quick Start
+### 2. 配置环境变量
 
-### Programmatic Usage
+复制环境变量模板并编辑：
+
+```bash
+cp .env.example .env
+```
+
+编辑 `.env` 文件，配置以下必填项：
+
+```bash
+# RPC 端点（推荐使用 Helius 或 QuickNode）
+RPC_URL=https://api.mainnet-beta.solana.com
+
+# 你的钱包私钥（base58 格式）
+PRIVATE_KEY=your-base58-private-key-here
+
+# API 服务端口
+API_PORT=3000
+```
+
+### 3. 启动 API 服务
+
+```bash
+# 生产模式
+npm run api
+
+# 开发模式（自动重启）
+npm run api:dev
+```
+
+服务启动后会显示：
+
+```
+🚀 Solana DEX Swap API Server running on port 3000
+📖 API Endpoints:
+   GET  /                     - API documentation
+   GET  /health               - Health check
+   GET  /markets              - List supported markets
+   POST /quote                - Get swap quote
+   POST /swap                 - Build swap transaction
+```
+
+## API 接口文档
+
+### 1. 健康检查
+
+**Endpoint:** `GET /health`
+
+**响应：**
+```json
+{
+  "status": "ok",
+  "timestamp": 1704700800000,
+  "rpcUrl": "https://api.mainnet-beta.solana.com"
+}
+```
+
+### 2. 获取支持的市场
+
+**Endpoint:** `GET /markets`
+
+**响应：**
+```json
+{
+  "markets": [
+    "PUMP_FUN",
+    "PUMP_SWAP",
+    "RAYDIUM_AMM",
+    "RAYDIUM_CLMM",
+    ...
+  ]
+}
+```
+
+### 3. Quote 询价接口 (Jupiter 风格)
+
+**Endpoint:** `POST /quote`
+
+**请求体：**
+```json
+{
+  "inputMint": "So11111111111111111111111111111111111111112",
+  "outputMint": "TokenMintAddressHere",
+  "amount": "10000000",
+  "slippageBps": 1000,
+  "market": "PUMP_FUN",
+  "poolAddress": "PoolAddressHere (可选)"
+}
+```
+
+**参数说明：**
+- `inputMint`: 输入代币地址（SOL 使用 `So11111111111111111111111111111111111111112`）
+- `outputMint`: 输出代币地址
+- `amount`: 输入数量（lamports 或 token 最小单位）
+- `slippageBps`: 滑点（基点，1000 = 10%，50 = 0.5%）
+- `market`: DEX 市场标识符
+- `poolAddress`: 可选，指定池子地址
+
+**响应：**
+```json
+{
+  "inputMint": "So11111111111111111111111111111111111111112",
+  "outputMint": "TokenMintAddressHere",
+  "inAmount": "10000000",
+  "outAmount": "1234567890",
+  "otherAmountThreshold": "1111111101",
+  "swapMode": "ExactIn",
+  "slippageBps": 1000,
+  "priceImpactPct": "0",
+  "market": "PUMP_FUN",
+  "poolAddress": null,
+  "contextSlot": 123456789,
+  "timeTaken": 1704700800000
+}
+```
+
+**响应字段说明：**
+- `inAmount`: 输入数量（字符串）
+- `outAmount`: 预期输出数量（字符串）
+- `otherAmountThreshold`: 考虑滑点后的最小输出数量（字符串）
+- `swapMode`: 交易模式（固定为 "ExactIn"）
+- `priceImpactPct`: 价格影响百分比（简化版本为 "0"）
+
+### 4. Swap 构建交易接口
+
+**Endpoint:** `POST /swap`
+
+**请求体：**
+```json
+{
+  "quoteResponse": {
+    "inputMint": "So11111111111111111111111111111111111111112",
+    "outputMint": "TokenMintAddressHere",
+    "inAmount": "10000000",
+    "outAmount": "1234567890",
+    "otherAmountThreshold": "1111111101",
+    "swapMode": "ExactIn",
+    "slippageBps": 1000,
+    "priceImpactPct": "0",
+    "market": "PUMP_FUN",
+    "poolAddress": null
+  },
+  "userPublicKey": "YourWalletPublicKeyHere",
+  "wrapUnwrapSOL": true,
+  "priorityFeeLamports": 100000
+}
+```
+
+**参数说明：**
+- `quoteResponse`: 从 `/quote` 接口获取的完整响应
+- `userPublicKey`: 用户钱包公钥
+- `wrapUnwrapSOL`: 是否自动包装/解包装 SOL（保留字段）
+- `priorityFeeLamports`: 优先级费用（lamports）
+
+**响应：**
+```json
+{
+  "swapTransaction": "base64EncodedTransactionHere...",
+  "lastValidBlockHeight": 123456789
+}
+```
+
+**响应字段说明：**
+- `swapTransaction`: Base64 编码的未签名交易
+- `lastValidBlockHeight`: 交易有效的最后区块高度
+
+## 使用示例
+
+### 完整的 Quote + Swap 流程
 
 ```typescript
-import { SolanaTrade } from 'solana-trade';
-import { Keypair } from '@solana/web3.js';
+import axios from 'axios';
+import { Connection, Keypair, Transaction } from '@solana/web3.js';
 import bs58 from 'bs58';
 
-// Initialize with custom RPC (optional)
-const trader = new SolanaTrade('https://your-premium-rpc.com');
+const API_BASE_URL = 'http://localhost:3000';
+const NATIVE_SOL_MINT = 'So11111111111111111111111111111111111111112';
 
-// Create wallet from private key
-const wallet = Keypair.fromSecretKey(bs58.decode('your-private-key-base58'));
+async function swapExample() {
+  // 1. 获取 Quote
+  const quoteRequest = {
+    inputMint: NATIVE_SOL_MINT,
+    outputMint: 'YourTokenMintHere',
+    amount: '10000000',  // 0.01 SOL
+    slippageBps: 1000,   // 10%
+    market: 'PUMP_FUN'
+  };
 
-// Buy 0.1 SOL worth of tokens
-const buySignature = await trader.buy({
-  market: 'PUMP_FUN',
-  wallet: wallet,
-  mint: 'So11111111111111111111111111111111111111112',
-  amount: 0.1,
-  slippage: 5, // 5%
-  sender: 'JITO', // Optional MEV protection
-  region: 'NY', // Optional region preference
-  antimev: true // Enable anti-MEV features
-});
+  const quoteResponse = await axios.post(`${API_BASE_URL}/quote`, quoteRequest);
+  const quote = quoteResponse.data;
 
-console.log('Buy transaction:', buySignature);
+  console.log('Expected output:', quote.outAmount);
+  console.log('Minimum output:', quote.otherAmountThreshold);
 
-// Sell 1,000,000 tokens
-const sellSignature = await trader.sell({
-  market: 'PUMP_FUN',
-  wallet: wallet,
-  mint: 'So11111111111111111111111111111111111111112',
-  amount: 1000000,
-  slippage: 5,
-  priorityFeeSol: 0.001, // Higher priority fee
-  tipAmountSol: 0.01 // MEV protection tip
-});
+  // 2. 构建交易
+  const wallet = Keypair.fromSecretKey(bs58.decode(process.env.PRIVATE_KEY!));
 
-console.log('Sell transaction:', sellSignature);
+  const swapRequest = {
+    quoteResponse: quote,
+    userPublicKey: wallet.publicKey.toBase58(),
+    priorityFeeLamports: 100000
+  };
 
-// Query spot price (SOL or lamports) & bonding curve percent
-const { price, bondingCurvePercent } = await trader.price({
-  market: 'RAYDIUM_CPMM',
-  mint: 'TokenMintAddress',
-  unit: 'SOL' // or 'LAMPORTS'
-});
+  const swapResponse = await axios.post(`${API_BASE_URL}/swap`, swapRequest);
+  const { swapTransaction, lastValidBlockHeight } = swapResponse.data;
 
-console.log('Price (SOL):', price, 'Curve %:', bondingCurvePercent);
+  // 3. 签名并发送交易
+  const txBuffer = Buffer.from(swapTransaction, 'base64');
+  const transaction = Transaction.from(txBuffer);
+  transaction.sign(wallet);
 
-// Get transaction object without sending (Legacy Transaction)
-const transaction = await trader.buy({
-  market: 'PUMP_FUN',
-  wallet: wallet,
-  mint: 'So11111111111111111111111111111111111111112',
-  amount: 0.1,
-  slippage: 5,
-  send: false // Returns Transaction object instead of sending
-});
+  const connection = new Connection(process.env.RPC_URL!);
+  const signature = await connection.sendRawTransaction(transaction.serialize());
 
-console.log('Transaction object:', transaction);
-// You can then send it manually or modify it further
-```
-
-### CLI Usage
-
-```bash
-# Install globally for CLI access
-npm install -g solana-trade
-
-# Buy tokens with Jito MEV protection
-solana-trade \
-  --market PUMP_FUN \
-  --direction buy \
-  --mint So11111111111111111111111111111111111111112 \
-  --amount 0.1 \
-  --slippage 5 \
-  --private-key your-base58-private-key \
-  --sender JITO \
-  --tip 0.001 \
-  --region NY
-
-# Get spot price via CLI (outputs JSON { price, bondingCurvePercent })
-solana-trade \
-  --price \
-  --market RAYDIUM_CPMM \
-  --mint TokenMintAddress \
-  --unit SOL
-
-# Sell tokens with custom priority fee
-solana-trade \
-  --market RAYDIUM_CLMM \
-  --direction sell \
-  --mint TokenMintAddress \
-  --amount 1000000 \
-  --slippage 3 \
-  --private-key your-base58-private-key \
-  --priority-fee 0.005 \
-  --skip-simulation true
-```
-
-## 📖 API Documentation
-
-### SolanaTrade Class
-
-#### Constructor
-
-```typescript
-new SolanaTrade(rpcUrl?: string)
-```
-
-**Parameters:**
-- `rpcUrl` (optional): Custom RPC endpoint URL. Defaults to `process.env.RPC_URL` or Solana mainnet-beta.
-
-#### Methods
-
-##### `buy(params: BuyParams): Promise<string | Transaction>`
-
-Execute a buy transaction.
-
-**Parameters:**
-```typescript
-interface BuyParams {
-  market: string;                    // Market identifier (see supported markets)
-  wallet: Keypair;                   // Solana wallet keypair
-  mint: PublicKey | string;          // Token mint address
-  amount: number;                    // SOL amount to spend
-  slippage: number;                  // Slippage tolerance (0-100)
-  priorityFeeSol?: number;           // Priority fee in SOL (default: 0.0001)
-  tipAmountSol?: number;             // MEV protection tip in SOL (default: 0)
-  poolAddress?: PublicKey | string;  // Specific pool address (optional, will skip pool discovery if provided)
-  send?: boolean;                    // Whether to send transaction (default: true)
-  sender?: 'ASTRALANE' | 'NOZOMI' | 'JITO'; // MEV protection service
-  antimev?: boolean;                 // Enable anti-MEV features (default: false)
-  region?: string;                   // Preferred region for MEV service
-  skipSimulation?: boolean;          // Skip transaction simulation (default: false)
-  skipConfirmation?: boolean;        // Skip confirmation waiting (default: false)
-  additionalInstructions?: TransactionInstruction[]; // Appends right after market instructions
+  console.log('Transaction:', signature);
+  console.log('Explorer:', `https://solscan.io/tx/${signature}`);
 }
 ```
 
-##### `sell(params: SellParams): Promise<string | Transaction>`
+### 测试脚本
 
-Execute a sell transaction. Same parameters as `buy()`, except `amount` represents token quantity.
-
-#### Adding additional instructions
-
-You can provide custom Solana `TransactionInstruction` items via `additionalInstructions`. They will be appended immediately after the market swap instructions and before any provider tip instructions:
-
-```typescript
-import { SystemProgram } from '@solana/web3.js';
-
-await trader.buy({
-  market: 'PUMP_FUN',
-  wallet,
-  mint: 'So11111111111111111111111111111111111111112',
-  amount: 0.1,
-  slippage: 5,
-  additionalInstructions: [
-    SystemProgram.transfer({
-      fromPubkey: wallet.publicKey,
-      toPubkey: wallet.publicKey, // example noop self-transfer
-      lamports: 1,
-    }),
-  ],
-});
-```
-
-## 🌍 Environment Variables
-
-### Core Configuration
+运行提供的测试脚本：
 
 ```bash
-# RPC Endpoint (optional, defaults to public mainnet)
-RPC_URL=https://your-rpc-endpoint.com
+# 编辑 test-jupiter-api.ts 中的配置
+npm run test:jupiter
 ```
 
-### MEV Protection Services
+## 与 Jupiter API 的对比
+
+| 特性 | Jupiter | 本项目 |
+|------|---------|--------|
+| Quote 接口 | ✅ | ✅ |
+| Swap 接口 | ✅ | ✅ |
+| 路由聚合 | ✅ | ❌ (单池直接交易) |
+| 多跳交易 | ✅ | ❌ |
+| 价格影响计算 | ✅ | 简化版 |
+| 支持 DEX 数量 | 20+ | 15+ |
+| 指定池子交易 | ❌ | ✅ |
+
+## 主要区别
+
+1. **无路由聚合**: 本项目不进行路由聚合，直接在指定的 DEX 池子进行交易
+2. **指定池子**: 支持通过 `poolAddress` 参数指定具体的池子地址
+3. **简化的价格影响**: 不计算复杂的价格影响，适合流动性充足的池子
+4. **单跳交易**: 仅支持单跳交易（A -> B），不支持多跳（A -> B -> C）
+
+## CLI 工具
+
+除了 API 接口，还提供命令行工具：
 
 ```bash
-# Jito Labs
-JITO_UUID=your-jito-uuid
+# 买入代币
+npm run trade -- buy --market PUMP_FUN --mint TokenMintHere --amount 0.01 --slippage 10
 
-# Nozomi
-NOZOMI_API_KEY=your-nozomi-api-key
-NOZOMI_API_KEY_ANTIMEV=your-nozomi-antimev-key  # Optional: for enhanced protection
+# 卖出代币
+npm run trade -- sell --market PUMP_FUN --mint TokenMintHere --amount 1000 --slippage 10
 
-# Astralane
-ASTRALANE_API_KEY=your-astralane-api-key
+# 查询价格
+npm run trade -- price --market PUMP_FUN --mint TokenMintHere
 ```
 
-### PumpSwap
+## 开发
 
 ```bash
-# Milliseconds to wait for PumpSwap pool readiness before decoding
-# Prevents early "invalid account discriminator" during snipes/migrations
-# Default: 5000
-PUMPSWAP_POOL_READY_TIMEOUT_MS=5000
-```
-
-## 📝 CLI Reference
-
-### Required Arguments
-- `--market`: Market identifier (see supported markets table)
-- `--direction`: Transaction direction (`buy` or `sell`)
-- `--mint`: Token mint address
-- `--amount`: Amount (SOL for buy, tokens for sell)
-- `--slippage`: Slippage tolerance (0-100)
-- `--private-key`: Base58-encoded private key
-
-### Optional Arguments
-- `--priority-fee`: Priority fee in SOL (default: 0.0001)
-- `--tip`: MEV protection tip in SOL (default: 0)
-- `--pool-address`: Specific pool address
-- `--sender`: MEV protection service (`JITO`, `NOZOMI`, `ASTRALANE`)
-- `--antimev`: Enable anti-MEV features (`true`, `false`)
-- `--region`: Preferred region code
-- `--skip-simulation`: Skip transaction simulation (`true`, `false`)
-- `--skip-confirmation`: Skip confirmation waiting (`true`, `false`)
-
-## 🛠️ Error Handling
-
-```typescript
-try {
-  const result = await trader.buy({
-    market: 'PUMP_FUN',
-    wallet: wallet,
-    mint: 'invalid-mint-address',
-    amount: 0.1,
-    slippage: 5,
-  });
-  console.log('Success:', result);
-} catch (error) {
-  if (error.message.includes('Simulation failed')) {
-    console.error('Transaction would fail:', error);
-    // Handle simulation failure
-  } else if (error.message.includes('HTTP')) {
-    console.error('Network error:', error);
-    // Handle network issues
-  } else {
-    console.error('Unknown error:', error);
-    // Handle other errors
-  }
-}
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Here's how you can help:
-
-### Development Setup
-
-```bash
-git clone https://github.com/FlorianMgs/solana-trade.git
-cd solana-trade
+# 安装依赖
 npm install
 
-# Build the project
+# 编译 TypeScript
 npm run build
 
-# Test the CLI
-npm run cli -- --help
+# 运行测试
+npm test
+
+# 启动开发服务器
+npm run api:dev
 ```
 
-### Contribution Guidelines
+## 注意事项
 
-1. **Fork the repository** and create your feature branch
-2. **Follow TypeScript best practices** and existing code style
-3. **Update documentation** for any API changes
-4. **Test thoroughly** across different markets and scenarios
-5. **Submit a pull request** with a clear description
+1. **RPC 限制**: 使用公共 RPC 可能有速率限制，建议使用 Helius 或 QuickNode
+2. **私钥安全**: 永远不要将私钥提交到版本控制系统
+3. **测试环境**: 建议先在 devnet 测试
+4. **滑点设置**: 根据代币流动性合理设置滑点
+5. **优先级费用**: 在网络拥堵时增加优先级费用
+6. **平台手续费**: 买入交易时会自动收取平台手续费（如已配置）
 
-### Areas We Need Help With
+## 平台手续费配置
 
-- 🚀 **New DEX/Launchpad Integrations**: We more than welcome new launchpads and DEXs to integrate their protocols into the project! This helps expand trading opportunities for all users.
-- 🔥 **Transaction senders**: If you're running a transaction provider service, don't hesitate to add it!
-- 📚 **Documentation**: Examples, tutorials, API documentation
-- 🐛 **Bug Reports**: Issue identification and reproduction steps
-- ✨ **New Features**: Optimization improvements, additional functionality
+本项目支持配置平台交易手续费，仅在买入交易时收取。
 
-### DEX/Launchpad Integration
+### 配置方法
 
-**New protocols are more than welcome!** If you're a DEX or launchpad team looking to integrate:
+在 `.env` 文件中添加以下配置：
 
-1. **Contact us** via GitHub Issues or email to discuss integration
-2. **Provide SDK/API documentation** for your protocol
-3. **Share test environments** and pool addresses for testing
-4. **Collaborate on implementation** - we'll help build the integration
-5. **Benefit from exposure** to our user base once integrated
+```bash
+# 平台手续费地址（不配置则不收取手续费）
+PLATFORM_FEE_ADDRESS=YourPlatformFeeAddressHere
 
-## ☕ Buy Me a Coffee
+# 平台手续费比例（不配置则默认 1%）
+PLATFORM_FEE_RATE=0.01
+```
 
-If this library helps your project, consider supporting its development:
+### 说明
 
-### Donate SOL
-**Address**: `CDuvRTHRaPFEQJYdHsEWpuE3yRB49Azi9e5g8Yi9Xm4d`
+- **PLATFORM_FEE_ADDRESS**: 平台手续费接收地址
+  - 如果不配置此地址，则不会收取任何手续费
+  - 必须是有效的 Solana 公钥地址
 
-### Why Support?
+- **PLATFORM_FEE_RATE**: 手续费比例
+  - 默认值：0.01（1%）
+  - 范围：0.0001 - 0.1（0.01% - 10%）
+  - 手续费 = 买入金额 × 手续费比例
 
-- 🔬 **Research & development**: New DEX integrations, optimization
-- 🛠️ **Maintenance**: Bug fixes, security updates, dependency management  
-- 📖 **Documentation**: Tutorials, examples, comprehensive guides
-- 🆘 **Support**: Community assistance, issue resolution
+### 示例
 
-*The library includes a small 0.15% fee on buy transactions to support development (disable with `DISABLE_DEV_TIP=true` if needed). Your donations and keeping the fee active help maintain this project! 🙏*
+```bash
+# 配置 1% 手续费
+PLATFORM_FEE_ADDRESS=YourAddressHere
+PLATFORM_FEE_RATE=0.01
 
-## 📜 License
+# 配置 0.5% 手续费
+PLATFORM_FEE_ADDRESS=YourAddressHere
+PLATFORM_FEE_RATE=0.005
 
-MIT License - see the [LICENSE](LICENSE) file for details.
+# 不收取手续费（不配置地址）
+# PLATFORM_FEE_ADDRESS=
+```
 
-## 🔗 Links
+### 手续费计算
 
-- **GitHub**: [https://github.com/FlorianMgs/solana-trade](https://github.com/FlorianMgs/solana-trade)
-- **NPM**: [https://www.npmjs.com/package/solana-trade](https://www.npmjs.com/package/solana-trade)
-- **Issues**: [https://github.com/FlorianMgs/solana-trade/issues](https://github.com/FlorianMgs/solana-trade/issues)
-- **Discussions**: [https://github.com/FlorianMgs/solana-trade/discussions](https://github.com/FlorianMgs/solana-trade/discussions)
+- 买入 0.1 SOL，手续费比例 1%：手续费 = 0.001 SOL
+- 买入 1 SOL，手续费比例 0.5%：手续费 = 0.005 SOL
+- 卖出交易：不收取手续费
 
-## 🆘 Support & Community
+## 许可证
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/FlorianMgs/solana-trade/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/FlorianMgs/solana-trade/discussions)  
+MIT
 
-## ⚠️ Disclaimer
+## 贡献
 
-**Important**: Trading cryptocurrencies involves substantial risk of loss and is not suitable for all investors. This software is provided "as-is" without any warranties or guarantees. The authors and contributors are not responsible for any financial losses incurred through the use of this software.
-
-**Key Risks:**
-- **Market Risk**: Cryptocurrency prices are highly volatile
-- **Technical Risk**: Smart contract bugs, network issues, transaction failures
-- **MEV Risk**: Sandwich attacks, front-running despite protection measures  
-- **Slippage Risk**: Price movement during transaction execution
-
-**Best Practices:**
-- Only trade with funds you can afford to lose
-- Test with small amounts first
-- Understand the risks of each DEX and token
-- Keep your private keys secure
-- Monitor transactions carefully
-
----
-
-<div align="center">
-
-**Made with ❤️ by [FlorianMgs (Madgic)](https://github.com/FlorianMgs)**
-
-*Pls leave a ⭐ star on GitHub!*
-
-</div>
+欢迎提交 Issue 和 Pull Request！

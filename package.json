@@ -33,15 +33,14 @@
     "astralane",
     "mev-protection"
   ],
-  "author": "MadgicDev (Madgic) <madgic.dev@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MadgicDev/solana-trade.git"
+    "url": "git+https://github.com/survivorff/solana_dex_node.git"
   },
-  "homepage": "https://github.com/MadgicDev/solana-trade#readme",
+  "homepage": "https://github.com/survivorff/solana_dex_node#readme",
   "bugs": {
-    "url": "https://github.com/MadgicDev/solana-trade/issues"
+    "url": "https://github.com/survivorff/solana_dex_node/issues"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

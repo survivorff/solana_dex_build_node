@@ -6,7 +6,7 @@ import { NozomiSenderClient } from './senders/nozomi';
 import { AstralaneSenderClient } from './senders/astralane';
 import { JitoSenderClient } from './senders/jito';
 import { createTipInstruction } from './helpers/instructions';
-import { 
+import {
   NOZOMI_TIP_ADDRESSES,
   ASTRALANE_TIP_ADDRESSES,
   NOZOMI_MIN_TIP_SOL,
@@ -16,9 +16,9 @@ import {
   JITO_TIP_ADDRESSES,
   JITO_MIN_TIP_SOL,
   JITO_REGIONS,
-  senders as Providers
+  senders as Providers,
+  PLATFORM_FEE_RATE_DEFAULT
 } from './helpers/constants';
-import { DEV_TIP_ADDRESS, DEV_TIP_RATE } from './helpers/constants';
 import { getPriceForMarket, PriceUnit } from './helpers/price';
 
 export class SolanaTrade {
@@ -133,11 +133,21 @@ export class SolanaTrade {
       additionalInstructions,
     });
 
-    if (direction === SwapDirection.BUY && !process.env.DISABLE_DEV_TIP) {
-      const devTipSol = (amount || 0) * DEV_TIP_RATE;
-      if (devTipSol > 0) {
-        const tipIx = createTipInstruction(DEV_TIP_ADDRESS, wallet.publicKey, devTipSol);
-        tx.add(tipIx);
+    // Add platform fee if configured
+    if (direction === SwapDirection.BUY && process.env.PLATFORM_FEE_ADDRESS) {
+      try {
+        const platformFeeAddress = new PublicKey(process.env.PLATFORM_FEE_ADDRESS);
+        const feeRate = process.env.PLATFORM_FEE_RATE
+          ? parseFloat(process.env.PLATFORM_FEE_RATE)
+          : PLATFORM_FEE_RATE_DEFAULT;
+        const platformFeeSol = (amount || 0) * feeRate;
+
+        if (platformFeeSol > 0) {
+          const feeIx = createTipInstruction(platformFeeAddress, wallet.publicKey, platformFeeSol);
+          tx.add(feeIx);
+        }
+      } catch (error) {
+        console.warn('Invalid PLATFORM_FEE_ADDRESS, skipping platform fee');
       }
     }
 

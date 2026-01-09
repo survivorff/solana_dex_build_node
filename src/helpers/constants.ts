@@ -1,5 +1,3 @@
-import { PublicKey } from "@solana/web3.js";
-
 export const LAMPORTS_TO_MICROLAMPORTS = 1e6;
 export const BASE_COMPUTE_UNITS = 1e6;
 
@@ -118,5 +116,5 @@ export const JITO_REGIONS: Record<string, string> = {
   TYO: 'https://tokyo.mainnet.block-engine.jito.wtf',
 };
 
-export const DEV_TIP_ADDRESS = new PublicKey('CDuvRTHRaPFEQJYdHsEWpuE3yRB49Azi9e5g8Yi9Xm4d');
-export const DEV_TIP_RATE = 0.0015; // 0.15%
+// Platform fee configuration
+export const PLATFORM_FEE_RATE_DEFAULT = 0.01; // 1%
