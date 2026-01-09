@@ -1,0 +1,21 @@
+
+> solana-trade@1.0.10 api
+> ts-node -r dotenv/config src/api-server.ts
+
+Error: listen EADDRINUSE: address already in use :::3000
+    at Server.setupListenHandle [as _listen2] (node:net:1937:16)
+    at listenInCluster (node:net:1994:12)
+    at Server.listen (node:net:2099:7)
+    at Function.listen (/Users/frank/draft/cluade_test/solana-trade/node_modules/express/lib/application.js:635:24)
+    at Object.<anonymous> (/Users/frank/draft/cluade_test/solana-trade/src/api-server.ts:289:5)
+    at Module._compile (node:internal/modules/cjs/loader:1734:14)
+    at Module.m._compile (/Users/frank/draft/cluade_test/solana-trade/node_modules/ts-node/src/index.ts:1618:23)
+    at loadTS (node:internal/modules/cjs/loader:1826:10)
+    at Object.require.extensions.<computed> [as .ts] (/Users/frank/draft/cluade_test/solana-trade/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1469:32) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '::',
+  port: 3000
+}
