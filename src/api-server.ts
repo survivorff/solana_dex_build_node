@@ -2,6 +2,7 @@ import express from 'express';
 import { Connection, PublicKey, Transaction, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { SolanaTrade } from './trader';
 import { buildTransaction } from './builder';
+import { getAccurateQuote } from './helpers/accurate-quote';
 
 const app = express();
 app.use(express.json());
@@ -31,52 +32,99 @@ app.post('/quote', async (req, res) => {
       });
     }
 
-    // 确定交易方向
-    const isBuy = inputMint === NATIVE_SOL_MINT;
-    const tokenMint = isBuy ? outputMint : inputMint;
+    try {
+      // 尝试使用精确计算
+      const accurateQuote = await getAccurateQuote(
+        connection,
+        market,
+        {
+          inputMint: new PublicKey(inputMint),
+          outputMint: new PublicKey(outputMint),
+          amount: amount.toString(),
+          slippageBps: Number(slippageBps),
+          poolAddress: poolAddress ? new PublicKey(poolAddress) : undefined
+        }
+      );
 
-    // 获取价格信息
-    const priceData = await trader.price({
-      market,
-      mint: tokenMint,
-      unit: 'LAMPORTS'
-    });
+      // 返回精确计算结果
+      const quoteResponse = {
+        inputMint,
+        outputMint,
+        inAmount: accurateQuote.inAmount,
+        outAmount: accurateQuote.outAmount,
+        otherAmountThreshold: accurateQuote.otherAmountThreshold,
+        swapMode: 'ExactIn',
+        slippageBps: Number(slippageBps),
+        priceImpactPct: accurateQuote.priceImpactPct,
+        market,
+        poolAddress: accurateQuote.poolInfo.poolAddress,
 
-    // 计算输入输出数量
-    let inAmount: number;
-    let outAmount: number;
-    let priceImpactPct = 0; // 简化版本，实际应该根据池子流动性计算
+        // 详细信息
+        details: {
+          spotPrice: accurateQuote.spotPrice,
+          executionPrice: accurateQuote.executionPrice,
+          fees: accurateQuote.fees,
+          route: {
+            poolAddress: accurateQuote.poolInfo.poolAddress,
+            reserves: accurateQuote.poolInfo.reserves,
+            decimals: accurateQuote.poolInfo.decimals
+          }
+        },
 
-    if (isBuy) {
-      // 买入：输入 SOL，输出 Token
-      inAmount = Number(amount);
-      outAmount = Math.floor(inAmount / priceData.price);
-    } else {
-      // 卖出：输入 Token，输出 SOL
-      inAmount = Number(amount);
-      outAmount = Math.floor(inAmount * priceData.price);
+        contextSlot: await connection.getSlot(),
+        timeTaken: Date.now()
+      };
+
+      res.json(quoteResponse);
+    } catch (accurateError: any) {
+      // 如果精确计算失败，回退到简单计算
+      console.warn('Accurate quote failed, falling back to simple calculation:', accurateError.message);
+
+      // 确定交易方向
+      const isBuy = inputMint === NATIVE_SOL_MINT;
+      const tokenMint = isBuy ? outputMint : inputMint;
+
+      // 获取价格信息
+      const priceData = await trader.price({
+        market,
+        mint: tokenMint,
+        unit: 'LAMPORTS'
+      });
+
+      // 计算输入输出数量
+      let inAmount: number;
+      let outAmount: number;
+      let priceImpactPct = 0;
+
+      if (isBuy) {
+        inAmount = Number(amount);
+        outAmount = Math.floor(inAmount / priceData.price);
+      } else {
+        inAmount = Number(amount);
+        outAmount = Math.floor(inAmount * priceData.price);
+      }
+
+      // 计算滑点保护的最小输出
+      const slippageDecimal = Number(slippageBps) / 10000;
+      const otherAmountThreshold = Math.floor(outAmount * (1 - slippageDecimal));
+
+      const quoteResponse = {
+        inputMint,
+        outputMint,
+        inAmount: inAmount.toString(),
+        outAmount: outAmount.toString(),
+        otherAmountThreshold: otherAmountThreshold.toString(),
+        swapMode: 'ExactIn',
+        slippageBps: Number(slippageBps),
+        priceImpactPct: priceImpactPct.toString(),
+        market,
+        poolAddress: poolAddress || null,
+        contextSlot: await connection.getSlot(),
+        timeTaken: Date.now()
+      };
+
+      res.json(quoteResponse);
     }
-
-    // 计算滑点保护的最小输出
-    const slippageDecimal = Number(slippageBps) / 10000;
-    const otherAmountThreshold = Math.floor(outAmount * (1 - slippageDecimal));
-
-    const quoteResponse = {
-      inputMint,
-      outputMint,
-      inAmount: inAmount.toString(),
-      outAmount: outAmount.toString(),
-      otherAmountThreshold: otherAmountThreshold.toString(),
-      swapMode: 'ExactIn',
-      slippageBps: Number(slippageBps),
-      priceImpactPct: priceImpactPct.toString(),
-      market,
-      poolAddress: poolAddress || null,
-      contextSlot: await connection.getSlot(),
-      timeTaken: Date.now()
-    };
-
-    res.json(quoteResponse);
   } catch (error: any) {
     console.error('Quote error:', error);
     res.status(500).json({

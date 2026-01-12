@@ -52,7 +52,10 @@
     "cli": "node -r dotenv/config dist/cli.js",
     "api": "ts-node -r dotenv/config src/api-server.ts",
     "api:dev": "nodemon --watch src --exec ts-node -r dotenv/config src/api-server.ts",
-    "test:api": "ts-node -r dotenv/config test-api-flow.ts"
+    "test:api": "ts-node -r dotenv/config test-api-flow.ts",
+    "test:quote": "ts-node -r dotenv/config test-accurate-quote.ts",
+    "test:pump": "ts-node -r dotenv/config test-pump-quotes.ts",
+    "test:native": "ts-node -r dotenv/config test-native-quotes.ts"
   },
   "dependencies": {
     "@meteora-ag/cp-amm-sdk": "^1.1.1",
