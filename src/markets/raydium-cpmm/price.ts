@@ -7,7 +7,7 @@ import { assertCpmmHasMintAndWsol, findCpmmPoolInfo } from './pool-utils';
 
 export async function getRaydiumCpmmPrice(connection: Connection, mint: PublicKey): Promise<MarketPriceResult> {
 	const owner = mint;
-	const raydium = await Raydium.load({ connection, owner });
+	const raydium = await Raydium.load({ connection, owner, disableLoadToken: true });
 	const poolInfo: any = await findCpmmPoolInfo(raydium, mint);
 	assertCpmmHasMintAndWsol(poolInfo, mint);
 

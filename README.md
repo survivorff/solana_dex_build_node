@@ -377,6 +377,18 @@ PLATFORM_FEE_RATE=0.005
 - 买入 1 SOL，手续费比例 0.5%：手续费 = 0.005 SOL
 - 卖出交易：不收取手续费
 
+## 📚 技术文档
+
+完整的技术文档请查看 [docs](./docs/) 目录:
+
+- **[设计文档](./docs/DESIGN.md)** - 项目背景、架构设计、核心功能
+- **[核心设计 - Quote 计算](./docs/CORE_DESIGN_QUOTE.md)** - Quote 计算系统详细设计
+- **[API 交付文档](./docs/API_DELIVERY.md)** - 完整 API 接口规范与使用示例
+- **[运维部署文档](./docs/DEPLOYMENT.md)** - 环境配置、部署、监控运维
+- **[测试文档](./docs/TESTING.md)** - 测试策略、测试用例、自测代码
+
+更多参考文档请查看 [docs/README.md](./docs/README.md)
+
 ## 许可证
 
 MIT
