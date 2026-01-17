@@ -1,7 +1,7 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { getPumpFunAccurateQuoteNative } from './src/markets/pump-fun/quote-native';
-import { getPumpSwapAccurateQuoteNative } from './src/markets/pump-swap/quote-native';
-import { getRaydiumCpmmAccurateQuoteNative } from './src/markets/raydium-cpmm/quote-native';
+import { getPumpFunAccurateQuoteNative } from '../../src/markets/pump-fun/quote-native';
+import { getPumpSwapAccurateQuoteNative } from '../../src/markets/pump-swap/quote-native';
+import { getRaydiumCpmmAccurateQuoteNative } from '../../src/markets/raydium-cpmm/quote-native';
 
 const RPC_URL = process.env.RPC_URL || 'https://api.mainnet-beta.solana.com';
 const connection = new Connection(RPC_URL);

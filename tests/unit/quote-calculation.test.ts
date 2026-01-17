@@ -33,23 +33,20 @@ const swapResult = CurveCalculator.swapBaseInput(
   tradeFeeRate,
   creatorFeeRate,
   protocolFeeRate,
-  fundFeeRate,
-  false
+  fundFeeRate
 );
 
-console.log('✅ Calculation Result:');
-console.log('  Output Amount:', swapResult.outputAmount.toString());
+console.log('✅ Swap Calculation Result:');
+console.log('  Output Amount:', swapResult.destinationAmountSwapped.toString());
 console.log('  Trade Fee:', swapResult.tradeFee.toString());
 console.log('  Protocol Fee:', swapResult.protocolFee.toString());
+console.log('  Fund Fee:', swapResult.fundFee.toString());
+
+// Calculate price
+const price = quoteReserve.mul(new BN(1e9)).div(baseReserve);
+console.log('\n💰 Price:');
+console.log('  Spot Price:', (price.toNumber() / 1e9).toFixed(6));
 
 // Calculate price impact
-const spotPrice = quoteReserve.mul(new BN(1e9)).div(baseReserve).toNumber() / 1e9;
-const executionPrice = swapResult.outputAmount.mul(new BN(1e9)).div(inputAmount).toNumber() / 1e9;
-const priceImpact = Math.abs((executionPrice - spotPrice) / spotPrice * 100);
-
-console.log('\n💰 Price Information:');
-console.log('  Spot Price:', spotPrice.toFixed(6));
-console.log('  Execution Price:', executionPrice.toFixed(6));
-console.log('  Price Impact:', priceImpact.toFixed(4) + '%');
-
-console.log('\n✅ Calculation logic test passed!');
+const priceImpact = inputAmount.mul(new BN(10000)).div(baseReserve);
+console.log('  Price Impact:', (priceImpact.toNumber() / 100).toFixed(4) + '%');

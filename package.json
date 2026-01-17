@@ -52,10 +52,14 @@
     "cli": "node -r dotenv/config dist/cli.js",
     "api": "ts-node -r dotenv/config src/api-server.ts",
     "api:dev": "nodemon --watch src --exec ts-node -r dotenv/config src/api-server.ts",
-    "test:api": "ts-node -r dotenv/config test-api-flow.ts",
-    "test:quote": "ts-node -r dotenv/config test-accurate-quote.ts",
-    "test:pump": "ts-node -r dotenv/config test-pump-quotes.ts",
-    "test:native": "ts-node -r dotenv/config test-native-quotes.ts"
+    "test:unit": "ts-node -r dotenv/config tests/unit/quote-calculation.test.ts",
+    "test:unit:native": "ts-node -r dotenv/config tests/unit/native-quotes.test.ts",
+    "test:api:jupiter": "ts-node -r dotenv/config tests/integration/api/jupiter-api.test.ts",
+    "test:api:quote": "ts-node -r dotenv/config tests/integration/api/accurate-quote.test.ts",
+    "test:e2e": "ts-node -r dotenv/config tests/integration/e2e/swap-flow.test.ts",
+    "test:market:pumpfun": "ts-node -r dotenv/config tests/markets/pump-fun.test.ts",
+    "test:market:pumpswap": "ts-node -r dotenv/config tests/markets/pump-swap.test.ts",
+    "test:market:raydium": "ts-node -r dotenv/config tests/markets/raydium-cpmm.test.ts"
   },
   "dependencies": {
     "@meteora-ag/cp-amm-sdk": "^1.1.1",
